@@ -1,0 +1,8 @@
+INCLUDES= -I ./
+OBJECTS= ./build/List.o
+
+all: ${OBJECTS}
+		gcc main.c -o main ${OBJECTS} -g
+
+./build/List.o: ./List.c
+	gcc List.c ${INCLUDES} -o ./build/List.o -g -c
