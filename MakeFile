@@ -6,3 +6,7 @@ all: ${OBJECTS}
 
 ./build/List.o: ./List.c
 	gcc List.c ${INCLUDES} -o ./build/List.o -g -c
+
+clean:
+		rm -rf ${OBJECTS}
+		rm -rf main
