@@ -7,6 +7,9 @@ int getBuffer(int spaceNeeded) {
 }
 
 void* mergeSort(void* data, int length, size_t size) {
+    if (length < 2) {
+        return data;
+    }
     int firstLength = length / 2;
     int secondLength = length - firstLength;
     void* firstHalf = firstLength > 1 ? mergeSort(data, firstLength, size) : data;
@@ -188,7 +191,9 @@ List* listcat(List* head, List* tail) {
 void listSort(List* list) {
     void* old = list->data;
     list->data = mergeSort(list->data, list->elements, list->sizeOfElement);
-    free(old);
+    if (old != list->data) {
+        free(old);
+    }
     // we are allocating the exact amount of memory during sorting and lose any buffer we have
     list->size = list->elements;
 }

@@ -170,6 +170,19 @@ void testSortList() {
     printf("Test#11 succeded\n");
 }
 
+void testSortEmptyList() {
+    List* list = listCreate(sizeof(int));
+    int element = 5;
+    listSort(list);
+    assert(list->size == 0);
+    listAddElement(list, &element);
+    listSort(list);
+    assert(*((int*) listGetElement(list, 0)) == 5);
+    assert(list->size == 1);
+    listFree(list);
+    printf("Test#12 succeded\n");
+}
+
 void testFindLastElement() {
     List* list = listCreate(sizeof(double));
     double arr[] = {1.2, 3.4, 5.6, 3.4};
@@ -184,7 +197,7 @@ void testFindLastElement() {
     // or -1 if it was not found
     assert(notFound == -1);
     listFree(list);
-    printf("Test#12 succeded\n");
+    printf("Test#13 succeded\n");
 }
 
 int main() {
@@ -199,5 +212,6 @@ int main() {
     testCompareList();
     testConcatList();
     testSortList();
+    testSortEmptyList();
     testFindLastElement();
 }
