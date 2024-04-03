@@ -2,23 +2,42 @@
 #include <stdlib.h>
 #include <memory.h>
 
+int getBuffer(int spaceNeeded) {
+    return (spaceNeeded / MINIMUM_ALLOCATION + (spaceNeeded % MINIMUM_ALLOCATION != 0)) * MINIMUM_ALLOCATION;
+}
+
 void* listReallocMemory(List* list, int extra) {
-    int multiplier = extra / MINIMUM_ALLOCATION + (extra % MINIMUM_ALLOCATION != 0);
-    list->data = realloc(list->data, (list->size + MINIMUM_ALLOCATION * multiplier) * list->sizeOfElement);
+    int buffer = getBuffer(extra);
+    list->data = realloc(list->data, (list->size + buffer) * list->sizeOfElement);
     if (!list->data) {
         free(list);
         return NULL;
     }
-    list->size += MINIMUM_ALLOCATION * multiplier;
+    list->size += buffer;
     return list->data;
+}
+
+List* listCreateWithSize(size_t sizeOfElement, int numberOfElements) {
+    int buffer = getBuffer(numberOfElements);
+    List* newList = (List*) calloc(1, sizeof(List));
+    if (newList) {
+        newList->sizeOfElement = sizeOfElement;
+        newList->data = malloc(buffer * sizeOfElement);
+        newList->size = buffer;
+        newList->elements = 0;
+    }
+    return newList;
 }
 
 List* listCreate(size_t sizeOfElement) {
     List* newList = (List*) calloc(1, sizeof(List));
-    newList->sizeOfElement = sizeOfElement;
-    newList->data = calloc(MINIMUM_ALLOCATION, sizeOfElement);
-    newList->size = 10;
-    newList->elements = 0;
+    if (newList) {
+        newList->sizeOfElement = sizeOfElement;
+        newList->data = malloc(MINIMUM_ALLOCATION * sizeOfElement);
+        newList->size = MINIMUM_ALLOCATION;
+        newList->elements = 0;
+    }
+    return newList;
 }
 
 int listLength(List* list) {
@@ -77,6 +96,22 @@ int listFindElement(List* list, void* element) {
     }
     return -1;
 }
+
+List* listcpy(List* list) {
+    List* newList = listCreateWithSize(list->sizeOfElement, list->elements);
+    if (newList) {
+        for (int i = 0; i < list->elements; i++) {
+            listAddElement(newList, list->data + i * list->sizeOfElement);
+        }
+    }
+    return newList;
+}
+
+// TODOs
+// Concat
+// Sort
+// Compare
+// rfind?
 
 void listFree(List* list) {
     free(list->data);

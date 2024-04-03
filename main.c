@@ -91,6 +91,23 @@ void testFindElement() {
     printf("Test#7 succeded\n");
 }
 
+void testCopyList() {
+    List* list = listCreate(sizeof(int));
+    int arr[] = {1, 2, 3, 4};
+    listAddMultiple(list, 4, arr);
+    List* other = listcpy(list);
+    // change the original array
+    listSetElement(list, arr, 2);
+    assert(*((int*) listGetElement(other, 0)) == 1);
+    assert(*((int*) listGetElement(other, 1)) == 2);
+    // the copy should not be affected by the change
+    assert(*((int*) listGetElement(other, 2)) == 3);
+    assert(*((int*) listGetElement(other, 3)) == 4);
+    listFree(list);
+    listFree(other);
+    printf("Test#8 succeded\n");
+}
+
 int main() {
     testCreateNewList();
     testCheckLengthOfNewList();
@@ -99,4 +116,5 @@ int main() {
     testSetElement();
     testAddMultipleElements();
     testFindElement();
+    testCopyList();
 }
