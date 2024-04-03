@@ -193,9 +193,6 @@ void listSort(List* list) {
     list->size = list->elements;
 }
 
-// TODOs
-// rfind?
-
 void listFree(List* list) {
     free(list->data);
     free(list);
