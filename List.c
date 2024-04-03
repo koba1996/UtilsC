@@ -107,10 +107,23 @@ List* listcpy(List* list) {
     return newList;
 }
 
+int listIsEqual(List* first, List* second) {
+    if (first->sizeOfElement != second->sizeOfElement || first->elements != second->elements) {
+        return 0;
+    }
+    size_t soe = first->sizeOfElement;
+    int elements = first->elements;
+    for (int i = 0; i < elements; i++) {
+        if (memcmp(first->data + i * soe, second->data + i * soe, soe) != 0) {
+            return 0;
+        }
+    }
+    return 1;
+}
+
 // TODOs
 // Concat
 // Sort
-// Compare
 // rfind?
 
 void listFree(List* list) {

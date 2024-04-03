@@ -21,6 +21,7 @@ void* listGetElement(List* list, int index);
 List* listSetElement(List* list, void* element, int index);
 int listFindElement(List* list, void* element);
 List* listcpy(List* list);
+int listIsEqual(List* first, List* second);
 void listFree(List* list);
 
 #endif

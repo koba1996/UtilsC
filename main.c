@@ -108,6 +108,30 @@ void testCopyList() {
     printf("Test#8 succeded\n");
 }
 
+void testCompareList() {
+    List* listi = listCreate(sizeof(int));
+    List* listc1 = listCreate(sizeof(char));
+    List* listc2 = listCreate(sizeof(char));
+    // lists with different types cannot be equal
+    assert(!(listIsEqual(listi, listc1)));
+    // empty lists with same type should be equal
+    assert(listIsEqual(listc1, listc2));
+    char c = 'a';
+    listAddElement(listc1, &c);
+    // lists with different length cannot be equal
+    assert(!(listIsEqual(listc1, listc2)));
+    c = 'b';
+    listAddElement(listc2, &c);
+    // lists with different values cannot be equal
+    assert(!(listIsEqual(listc1, listc2)));
+    // should synergize with listcpy
+    assert(listIsEqual(listc1, listcpy(listc1)));
+    listFree(listi);
+    listFree(listc1);
+    listFree(listc2);
+    printf("Test#9 succeded\n");
+}
+
 int main() {
     testCreateNewList();
     testCheckLengthOfNewList();
@@ -117,4 +141,5 @@ int main() {
     testAddMultipleElements();
     testFindElement();
     testCopyList();
+    testCompareList();
 }
