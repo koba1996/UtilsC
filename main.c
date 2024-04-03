@@ -132,6 +132,25 @@ void testCompareList() {
     printf("Test#9 succeded\n");
 }
 
+void testConcatList() {
+    List* listi = listCreate(sizeof(int));
+    List* listc1 = listCreate(sizeof(char));
+    List* listc2 = listCreate(sizeof(char));
+    char arr[] = {'a', 'b'};
+    listAddMultiple(listc1, 2, arr);
+    listAddMultiple(listc2, 2, arr);
+    listcat(listc1, listc2);
+    assert(*((char*) listGetElement(listc1, 0)) == 'a');
+    assert(*((char*) listGetElement(listc1, 1)) == 'b');
+    assert(*((char*) listGetElement(listc1, 2)) == 'a');
+    assert(*((char*) listGetElement(listc1, 3)) == 'b');
+    assert(!listcat(listc1, listi));
+    listFree(listi);
+    listFree(listc1);
+    listFree(listc2);
+    printf("Test#10 succeded\n");
+}
+
 int main() {
     testCreateNewList();
     testCheckLengthOfNewList();
@@ -142,4 +161,5 @@ int main() {
     testFindElement();
     testCopyList();
     testCompareList();
+    testConcatList();
 }

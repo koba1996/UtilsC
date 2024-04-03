@@ -22,6 +22,7 @@ List* listSetElement(List* list, void* element, int index);
 int listFindElement(List* list, void* element);
 List* listcpy(List* list);
 int listIsEqual(List* first, List* second);
+List* listcat(List* head, List* tail);
 void listFree(List* list);
 
 #endif
