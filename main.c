@@ -137,18 +137,54 @@ void testConcatList() {
     List* listc1 = listCreate(sizeof(char));
     List* listc2 = listCreate(sizeof(char));
     char arr[] = {'a', 'b'};
+    int arri[] = {1, 2};
     listAddMultiple(listc1, 2, arr);
     listAddMultiple(listc2, 2, arr);
+    listAddMultiple(listi, 2, arri);
     listcat(listc1, listc2);
     assert(*((char*) listGetElement(listc1, 0)) == 'a');
     assert(*((char*) listGetElement(listc1, 1)) == 'b');
     assert(*((char*) listGetElement(listc1, 2)) == 'a');
     assert(*((char*) listGetElement(listc1, 3)) == 'b');
+    assert(listc1->elements == 4);
+    assert(listc2->elements == 2);
     assert(!listcat(listc1, listi));
+    assert(listc1->elements == 4);
+    assert(listi->elements == 2);
     listFree(listi);
     listFree(listc1);
     listFree(listc2);
     printf("Test#10 succeded\n");
+}
+
+void testSortList() {
+    List* list = listCreate(sizeof(int));
+    int arr[] = {3, 2, 4, 1};
+    listAddMultiple(list, 4, arr);
+    listSort(list);
+    assert(*((int*) listGetElement(list, 0)) == 1);
+    assert(*((int*) listGetElement(list, 1)) == 2);
+    assert(*((int*) listGetElement(list, 2)) == 3);
+    assert(*((int*) listGetElement(list, 3)) == 4);
+    listFree(list);
+    printf("Test#11 succeded\n");
+}
+
+void testFindLastElement() {
+    List* list = listCreate(sizeof(double));
+    double arr[] = {1.2, 3.4, 5.6, 3.4};
+    double notElement = 7.8;
+    listAddMultiple(list, 4, arr);
+    int found = listFindLastElement(list, arr + 2);
+    int findFirst = listFindLastElement(list, arr + 1);
+    int notFound = listFindLastElement(list, &notElement);
+    assert(found == 2);
+    // should return the last occurence
+    assert(findFirst == 3);
+    // or -1 if it was not found
+    assert(notFound == -1);
+    listFree(list);
+    printf("Test#12 succeded\n");
 }
 
 int main() {
@@ -162,4 +198,6 @@ int main() {
     testCopyList();
     testCompareList();
     testConcatList();
+    testSortList();
+    testFindLastElement();
 }

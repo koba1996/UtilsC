@@ -6,6 +6,42 @@ int getBuffer(int spaceNeeded) {
     return (spaceNeeded / MINIMUM_ALLOCATION + (spaceNeeded % MINIMUM_ALLOCATION != 0)) * MINIMUM_ALLOCATION;
 }
 
+void* mergeSort(void* data, int length, size_t size) {
+    int firstLength = length / 2;
+    int secondLength = length - firstLength;
+    void* firstHalf = firstLength > 1 ? mergeSort(data, firstLength, size) : data;
+    void* secondHalf = secondLength > 1 
+        ? mergeSort(data + firstLength * size, secondLength, size) 
+        : data + firstLength * size;
+    void* sorted = malloc(length * size);
+    int p1 = 0, p2 = 0;
+    void *destination, *source;
+    for (int i = 0; i < length; i++) {
+        destination = sorted + i * size;
+        if (p1 == firstLength) {
+            source = secondHalf + p2 * size;
+            p2++;
+        } else if (p2 == secondLength) {
+            source = firstHalf + p1 * size;
+            p1++;
+        } else if (memcmp(firstHalf + p1 * size, secondHalf + p2 * size, size) < 0) {
+            source = firstHalf + p1 * size;
+            p1++;
+        } else {
+            source = secondHalf + p2 * size;
+            p2++;
+        }
+        memcpy(destination, source, size);
+    }
+    if (firstLength > 1) {
+        free(firstHalf);
+    }
+    if (secondLength > 1) {
+        free(secondHalf);
+    }
+    return sorted;
+}
+
 void* listReallocMemory(List* list, int newSize) {
     int buffer = getBuffer(newSize);
     list->data = realloc(list->data, buffer * list->sizeOfElement);
@@ -101,6 +137,15 @@ int listFindElement(List* list, void* element) {
     return -1;
 }
 
+int listFindLastElement(List* list, void* element) {
+    for (int i = list->elements - 1; i >= 0; i--) {
+        if (memcmp(getDataAt(list, i), element, list->sizeOfElement) == 0) {
+            return i;
+        }
+    }
+    return -1;
+}
+
 List* listcpy(List* list) {
     List* newList = listCreateWithSize(list->sizeOfElement, list->elements);
     if (newList) {
@@ -140,8 +185,15 @@ List* listcat(List* head, List* tail) {
     return head;
 }
 
+void listSort(List* list) {
+    void* old = list->data;
+    list->data = mergeSort(list->data, list->elements, list->sizeOfElement);
+    free(old);
+    // we are allocating the exact amount of memory during sorting and lose any buffer we have
+    list->size = list->elements;
+}
+
 // TODOs
-// Sort
 // rfind?
 
 void listFree(List* list) {
