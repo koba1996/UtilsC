@@ -33,7 +33,7 @@ void testAddElement() {
     printf("Test#3 succeded\n");
 }
 
-void testAddMultipleElement() {
+void testAddHundredElements() {
     List* list = listCreate(sizeof(int));
     int element;
     for (int i = 0; i < 100; i++) {
@@ -60,10 +60,43 @@ void testSetElement() {
     printf("Test#5 succeded\n");
 }
 
+void testAddMultipleElements() {
+    List* list = listCreate(sizeof(double));
+    double arr[] = {1.2, 3.4, 5.6, 7.8};
+    listAddMultiple(list, 4, arr);
+    assert(*((double*) listGetElement(list, 0)) == 1.2);
+    assert(*((double*) listGetElement(list, 1)) == 3.4);
+    assert(*((double*) listGetElement(list, 2)) == 5.6);
+    assert(*((double*) listGetElement(list, 3)) == 7.8);
+    assert(list->size == 10);
+    assert(list->elements == 4);
+    listFree(list);
+    printf("Test#6 succeded\n");
+}
+
+void testFindElement() {
+    List* list = listCreate(sizeof(double));
+    double arr[] = {1.2, 3.4, 5.6, 3.4};
+    double notElement = 7.8;
+    listAddMultiple(list, 4, arr);
+    int found = listFindElement(list, arr + 2);
+    int findFirst = listFindElement(list, arr + 1);
+    int notFound = listFindElement(list, &notElement);
+    assert(found == 2);
+    // should return the first occurence
+    assert(findFirst == 1);
+    // or -1 if it was not found
+    assert(notFound == -1);
+    listFree(list);
+    printf("Test#7 succeded\n");
+}
+
 int main() {
     testCreateNewList();
     testCheckLengthOfNewList();
     testAddElement();
-    testAddMultipleElement();
+    testAddHundredElements();
     testSetElement();
+    testAddMultipleElements();
+    testFindElement();
 }
