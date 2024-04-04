@@ -45,6 +45,10 @@ void* mergeSort(void* data, int length, size_t size) {
     return sorted;
 }
 
+void* getDataAt(List* list, int index) {
+    return list->data + index * list->sizeOfElement;
+}
+
 void* listReallocMemory(List* list, int newSize) {
     int buffer = getBuffer(newSize);
     list->data = realloc(list->data, buffer * list->sizeOfElement);
@@ -56,7 +60,15 @@ void* listReallocMemory(List* list, int newSize) {
     return list->data;
 }
 
-List* listCreateWithSize(size_t sizeOfElement, int numberOfElements) {
+void* listSetDefault(List* list, void* defaultValue) {
+    list->defaultElement = malloc(list->sizeOfElement);
+    if (list->defaultElement) {
+        memcpy(list->defaultElement, defaultValue, list->sizeOfElement);
+    }
+    return list->defaultElement;
+}
+
+List* listCreateWithSize(size_t sizeOfElement, int numberOfElements, void* defaultElement) {
     int buffer = getBuffer(numberOfElements);
     List* newList = (List*) calloc(1, sizeof(List));
     if (newList) {
@@ -64,6 +76,14 @@ List* listCreateWithSize(size_t sizeOfElement, int numberOfElements) {
         newList->data = malloc(buffer * sizeOfElement);
         newList->size = buffer;
         newList->elements = 0;
+        if (defaultElement) {
+            if (!(listSetDefault(newList, defaultElement))) {
+                listFree(newList);
+            }
+        } else {
+            newList->defaultElement = NULL;
+        }
+        
     }
     return newList;
 }
@@ -75,12 +95,19 @@ List* listCreate(size_t sizeOfElement) {
         newList->data = malloc(MINIMUM_ALLOCATION * sizeOfElement);
         newList->size = MINIMUM_ALLOCATION;
         newList->elements = 0;
+        newList->defaultElement = NULL;
     }
     return newList;
 }
 
-void* getDataAt(List* list, int index) {
-    return list->data + index * list->sizeOfElement;
+List* listCreateDefault(size_t sizeOfElement, void* defaultValue, int startSize) {
+    List* newList = listCreateWithSize(sizeOfElement, startSize, defaultValue);
+    if (newList) {
+        for (; newList->elements < startSize;) {
+            listAddElement(newList, newList->defaultElement);
+        }
+    }
+    return newList;
 }
 
 int listLength(List* list) {
@@ -118,7 +145,13 @@ List* listSetElement(List* list, void* element, int index) {
             return NULL;
         }
     }
-    list->elements = index;
+    if (list->defaultElement) {
+        for (; list->elements < index; list->elements++) {
+            memcpy(getDataAt(list, list->elements), list->defaultElement, list->sizeOfElement);
+        }
+    } else {
+        list->elements = index;
+    }
     listAddElement(list, element);
     return list;
 }
@@ -150,13 +183,7 @@ int listFindLastElement(List* list, void* element) {
 }
 
 List* listcpy(List* list) {
-    List* newList = listCreateWithSize(list->sizeOfElement, list->elements);
-    if (newList) {
-        for (int i = 0; i < list->elements; i++) {
-            listAddElement(newList, getDataAt(list, i));
-        }
-    }
-    return newList;
+    return listSubList(list, 0, list->elements);
 }
 
 int listIsEqual(List* first, List* second) {
@@ -198,7 +225,32 @@ void listSort(List* list) {
     list->size = list->elements;
 }
 
+List* listSubList(List* list, int start, int end) {
+    if (start < 0 || end > list->elements || start > end) {
+        return NULL;
+    }
+    List* newList = listCreateWithSize(list->sizeOfElement, end - start, list->defaultElement);
+    if (newList) {
+        for (int i = start; i < end; i++) {
+            listAddElement(newList, getDataAt(list, i));
+        }
+    }
+    return newList;
+}
+
+void listReverse(List* list) {
+    void* tmp;
+    for (int i = 0; i < list->elements / 2; i++) {
+        memcpy(tmp, getDataAt(list, i), list->sizeOfElement);
+        memcpy(getDataAt(list, i), getDataAt(list, list->elements - 1 - i), list->sizeOfElement);
+        memcpy(getDataAt(list, list->elements - 1 - i), tmp, list->sizeOfElement);
+    }
+}
+
 void listFree(List* list) {
     free(list->data);
+    if (list->defaultElement) {
+        free(list->defaultElement);
+    }
     free(list);
 }
